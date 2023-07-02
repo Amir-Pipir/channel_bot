@@ -8,7 +8,7 @@ from bitrix_API import insert_lead
 
 kb = ReplyKeyboardMarkup(resize_keyboard=True).add(KeyboardButton('Отправить свой контакт ☎️', request_contact=True))
 kb2 = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True).add("Проживание в Кингдом",
-                                                                            "Трансформация").row("Консалтинг")
+                                                                            "ТрансформациЯ в Мы").row("Консалтинг")
 
 
 class Approve(StatesGroup):
@@ -19,7 +19,7 @@ class Approve(StatesGroup):
 
 
 async def start(update: types.ChatJoinRequest):
-    await bot.send_message(update.from_user.id, "Чтобы пройти в телеграм канал, пожалуйста отправьте свой контакт и ответьте на 3 вопросов",
+    await bot.send_message(chat_id=update.from_user.id,text= "Чтобы пройти в телеграм канал, пожалуйста отправьте свой контакт и ответьте на 3 вопросов",
                            reply_markup=kb)
 
 
