@@ -1,6 +1,6 @@
 import requests
 
-async def insert_lead(ans1, ans2, ans3, username, user_fname):
+async def insert_lead(number, ans1, ans2, ans3, username, user_fname):
     url = "https://kingdomuniversity.bitrix24.ru/rest/25/2pcf4gb5vno4ojt0/crm.lead.add.json"
 
     headers = {'Content-Type': 'application/json'}
@@ -9,6 +9,7 @@ async def insert_lead(ans1, ans2, ans3, username, user_fname):
         "fields":
         {
             "TITLE": user_fname,
+            "PHONE": [{"VALUE": number, "VALUE_TYPE": "WORK"}],
             "UF_CRM_1688153622107": ans1,
             "UF_CRM_1688153632970": ans3,
             "NAME": username,
