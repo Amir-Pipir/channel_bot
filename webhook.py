@@ -9,8 +9,8 @@ load_dotenv()
 
 token = os.getenv('TOKEN')
 WEBHOOK_DOMAIN = os.getenv('DOMAIN')
-WEBAPP_HOST = '0.0.0.0'
-WEBAPP_PORT = '8000'
+WEBAPP_HOST = '127.0.0.1'
+WEBAPP_PORT = '8443'
 
 
 handlers.register_handlers_other(dp)
