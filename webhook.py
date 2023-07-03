@@ -16,11 +16,11 @@ WEBAPP_PORT = '8443'
 handlers.register_handlers_other(dp)
 
 
-async def on_startup(dispatcher):
+async def on_startup(dp):
     await bot.set_webhook(WEBHOOK_DOMAIN, drop_pending_updates=True)
 
 
-async def on_shutdown(dispatcher):
+async def on_shutdown(dp):
     await bot.delete_webhook()
 
 if __name__ == '__main__':
