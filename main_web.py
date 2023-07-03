@@ -1,16 +1,20 @@
 from aiogram import types
 import handlers
 from aiohttp import web
-from config import TOKEN
 from create_bot import dp, bot
+import os
+from dotenv import load_dotenv
 
+load_dotenv()
+TOKEN = os.getenv('TOKEN')
+DOMAIN = os.getenv('DOMAIN')
 
 app = web.Application()
 
 webhook_path = f'/{TOKEN}'
 
 async def set_webhook():
-    webhook_uri = f'164.90.145.149'
+    webhook_uri = DOMAIN + webhook_path
     await bot.set_webhook(webhook_uri)
 async def on_startup(_):
     await set_webhook()
@@ -40,5 +44,5 @@ if __name__ == "__main__":
     web.run_app(
         app,
         host='0.0.0.0',
-        port=8000,
+        port=80,
     )

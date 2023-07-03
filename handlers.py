@@ -3,8 +3,9 @@ from create_bot import bot, Dispatcher
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
-from config import CHANNEL_ID
+from create_bot import CHANNEL_ID
 from bitrix_API import insert_lead
+import re
 
 kb = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True).add(KeyboardButton('Отправить свой контакт ☎️', request_contact=True))
 kb2 = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True).add("Проживание в Кингдом",
@@ -17,6 +18,9 @@ class Approve(StatesGroup):
     que2 = State()
     que3 = State()
 
+def is_valid_email(email):
+    pattern = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
+    return re.match(pattern, email) is not None
 
 async def start(update: types.ChatJoinRequest):
     await bot.send_message(chat_id=update.from_user.id, text="КингДОМ приветствует Вас! Для подключения к экосистеме КингДОМ отправьте свой контакт и ответьте пожалуйста на 3 вопроса",
@@ -38,6 +42,9 @@ async def answer1(message: types.Message, state: FSMContext):
 
 
 async def answer2(message: types.Message, state: FSMContext):
+    if not is_valid_email(message.text):
+        await message.answer("Некорректный email, попробуйте еще раз")
+        return
     async with state.proxy() as data:
         data['que2'] = message.text
     await message.answer("Какая программа вас интересует?", reply_markup=kb2)
@@ -51,21 +58,19 @@ async def answer3(message: types.Message, state: FSMContext):
         answ1 = data['que1']
         answ2 = data['que2']
     await message.answer(f"Ваши ответы:\n\n1. {answ1}\n2. {answ2}\n3. {answ3}\n")
-    x = await insert_lead(number, answ1, answ2, answ3, message.from_user.username, message.from_user.first_name)
-    if x is True:
-        await state.finish()
-        try:
-            await bot.approve_chat_join_request(CHANNEL_ID, message.from_user.id)
-            await message.answer("Вы добавлены в канал!")
-        except:
-            await message.answer("Вы уже есть в канале!")
-    else:
-        await state.finish()
-        await message.answer("Ошибка!Email неправильно введен!\nПопробуйте снова", reply_markup=kb)
+    await insert_lead(number, answ1, answ2, answ3, message.from_user.first_name, message.from_user.last_name)
+    await state.finish()
+    try:
+        await bot.approve_chat_join_request(CHANNEL_ID, message.from_user.id)
+        await message.answer("Вы добавлены в канал!")
+    except:
+        await message.answer("Вы уже есть в канале!")
+
 
 
 def register_handlers_other(dp: Dispatcher):
     dp.register_chat_join_request_handler(start)
+    dp.register_message_handler(start, commands=['start'])
     dp.register_message_handler(start_que, content_types=types.ContentType.CONTACT)
     dp.register_message_handler(answer1, state=Approve.que1)
     dp.register_message_handler(answer2, state=Approve.que2)
