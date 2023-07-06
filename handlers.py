@@ -4,7 +4,7 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 from create_bot import CHANNEL_ID
-from bitrix_API import insert_lead
+from bitrix_API import insert_contact, insert_deal
 import re
 
 kb = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True).add(KeyboardButton('Отправить свой контакт ☎️', request_contact=True))
@@ -58,13 +58,25 @@ async def answer3(message: types.Message, state: FSMContext):
         answ1 = data['que1']
         answ2 = data['que2']
     await message.answer(f"Ваши ответы:\n\n1. {answ1}\n2. {answ2}\n3. {answ3}\n")
-    await insert_lead(number, answ1, answ2, answ3, message.from_user.first_name, message.from_user.last_name)
+    await add_contatc_deal(number, answ1, answ2, answ3, message.from_user.first_name, message.from_user.last_name)
     await state.finish()
     try:
         await bot.approve_chat_join_request(CHANNEL_ID, message.from_user.id)
         await message.answer("Вы добавлены в канал!")
     except:
         await message.answer("Вы уже есть в канале!")
+
+async def add_contatc_deal(number, ans1, email, ans3, user_fname, user_lname):
+    contact_response = await insert_contact(number, ans1, email, ans3, user_fname, user_lname)
+    if contact_response:
+        contact_id = contact_response
+        deal_response = await insert_deal(contact_id, user_fname, ans1, ans3)
+        if deal_response:
+            print('Новый контакт и сделка успешно добавлены в Битрикс24')
+        else:
+            print('Ошибка при создании сделки')
+    else:
+        print('Ошибка при создании контакта')
 
 
 

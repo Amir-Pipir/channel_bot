@@ -1,6 +1,6 @@
 import requests
 
-async def insert_lead(number, ans1, ans2, ans3, user_fname, user_lname):
+async def insert_contact(number, ans1, ans2, ans3, user_fname, user_lname):
     url_contact = "https://kingdomuniversity.bitrix24.ru/rest/25/ppvmuxdgyk440qm7/crm.contact.add.json"
 
     params = {
@@ -17,8 +17,10 @@ async def insert_lead(number, ans1, ans2, ans3, user_fname, user_lname):
         'params': {'REGISTER_SONET_EVENT': 'Y'}
     }
     response1 = requests.post(url_contact, json=params)
-    contact_id = response1.json()['result']
+    return response1.json()['result']
 
+
+async def insert_deal(contact_id, user_fname, ans1, ans3):
     url_deal = "https://kingdomuniversity.bitrix24.ru/rest/25/bri44f78o7dlfn2k/crm.deal.add.json"
 
     params2 = {
@@ -30,6 +32,7 @@ async def insert_lead(number, ans1, ans2, ans3, user_fname, user_lname):
         }
     }
     response2 = requests.post(url_deal, json=params2)
+
 
 
 
